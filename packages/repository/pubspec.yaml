@@ -1,0 +1,38 @@
+name: repository
+description: "A new Flutter package project."
+version: 0.0.1
+homepage:
+publish_to: none
+
+environment:
+  sdk: ^3.10.7
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  camera:
+
+  key_api:
+    path: ../key_api
+
+  key_encrypt:
+    path: ../key_encrypt
+
+  request:
+    path: ../request
+
+  picture:
+    path: ../picture
+
+  internet_conn_ckecking:
+    path: ../internet_conn_ckecking
+  worker_manager: ^7.2.7
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:

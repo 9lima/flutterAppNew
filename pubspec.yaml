@@ -1,0 +1,42 @@
+name: flutter_application_1
+description: "A new Flutter project."
+publish_to: "none"
+version: 0.1.0
+
+environment:
+  sdk: ^3.10.7
+
+dependencies:
+  flutter:
+    sdk: flutter
+  camera: ^0.11.4
+  flutter_bloc: ^9.1.1
+  get_it: ^9.2.0
+
+  key_api:
+    path: packages/key_api
+
+  key_encrypt:
+    path: packages/key_encrypt
+
+  request:
+    path: packages/request
+
+  picture:
+    path: packages/picture
+
+  internet_conn_ckecking:
+    path: packages/internet_conn_ckecking
+
+  repository:
+    path: packages/repository
+  bloc_concurrency: ^0.3.0
+  worker_manager: ^7.2.7
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true

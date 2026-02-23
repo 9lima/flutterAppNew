@@ -1,0 +1,22 @@
+name: internet_conn_ckecking
+description: "A new Flutter package project."
+version: 0.0.1
+homepage:
+
+environment:
+  sdk: ^3.10.7
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  internet_connection_checker: ^3.0.1
+  mocktail: ^1.0.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  test: ^1.26.3
+
+flutter:
