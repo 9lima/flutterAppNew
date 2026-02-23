@@ -79,7 +79,11 @@ class _HomePageState extends State<HomePage> {
                           onPressed: () {
                             context.read<PictureBloc>().add(PictureUpload());
                           },
-                          child: const Text('Upload'),
+                          child:
+                              context.read<PictureBloc>().state.status ==
+                                  PictureStatus.uploading
+                              ? CircularProgressIndicator()
+                              : const Text('Upload'),
                         );
                       }
 
@@ -95,7 +99,7 @@ class _HomePageState extends State<HomePage> {
                   if (state.status == ConnectivityStatus.disconnected) {
                     return showMessage(
                       context,
-                      msg: 'No Internet Connection',
+                      msg: 'not connected ...',
                       status: Status.error,
                     );
                   } else {
@@ -173,10 +177,13 @@ class _HomePageState extends State<HomePage> {
                         child: Column(
                           children: [
                             const CircularProgressIndicator(),
+                            const SizedBox(height: 20),
                             Text("loading ..."),
                           ],
                         ),
                       );
+                    default:
+                      return const SizedBox.shrink();
                   }
                 },
               ),

@@ -113,7 +113,9 @@ base class Repository {
 
   Future<RepositoryDatasource> takePicture() async {
     final PictureDatasource pictureDatasource = await pictureApi.takePicture();
-    repositoryDatasource.copyWith(pictureDatasource: pictureDatasource);
+    repositoryDatasource = repositoryDatasource.copyWith(
+      pictureDatasource: pictureDatasource,
+    );
     return repositoryDatasource;
   }
 

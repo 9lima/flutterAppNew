@@ -66,8 +66,8 @@ async def create_user(user:_schemas.PublicKeyRequest_Base, db: _orm.Session = _f
     db.commit()
     db.refresh(db_user)
 
-    print(Public_Key_Response.model_dump(mode='json'))
-    print('*'*10, list(aes))
+    # print(Public_Key_Response.model_dump(mode='json'))
+    # print('*'*10, list(aes))
     return Public_Key_Response.model_dump(mode='json')
 
     

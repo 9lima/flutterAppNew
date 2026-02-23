@@ -10,7 +10,7 @@ class PictureBloc extends Bloc<PictureEvent, PictureState> {
 
   PictureBloc({required this.repository}) : super(PictureState.initial()) {
     on<LoadKeys>(_loadKeys, transformer: sequential());
-    on<PictureInit>(_onInit);
+    on<PictureInit>(_onInit, transformer: droppable());
     on<PictureTaken>(_onTaken);
     on<PickPictureFromGallery>(_onPickFromGallery, transformer: droppable());
     on<PictureUpload>(_onPictureUpload, transformer: droppable());
@@ -136,6 +136,7 @@ class PictureBloc extends Bloc<PictureEvent, PictureState> {
   // ////////////// //
   Future<void> _onPictureUpload(PictureUpload event, Emitter emit) async {
     try {
+      emit(state.copyWith(status: PictureStatus.uploading));
       final RepositoryDatasource res = await repository.sendRequest(
         '/dataa',
         state.image!,

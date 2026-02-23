@@ -8,6 +8,7 @@ enum PictureStatus {
   error,
   uploaded,
   loading,
+  uploading,
 }
 
 class PictureState {
