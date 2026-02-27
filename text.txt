@@ -1,0 +1,11 @@
+if (list != null && list!.isNotEmpty)
+              GridView.builder(
+                shrinkWrap: true,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 4,
+                ),
+                itemCount: list!.length,
+                itemBuilder: (context, index) {
+                  return Image.memory(list![index], fit: BoxFit.cover);
+                },
+              ),
