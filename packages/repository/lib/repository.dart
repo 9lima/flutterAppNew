@@ -105,12 +105,66 @@ base class Repository {
     }
   }
 
-  // Picture Functions 🖼️🖼️🖼️🖼️
+  //  openCamera 🖼️🖼️🖼️🖼️🖼️🖼️🖼️🖼️🖼️🖼️🖼️🖼️🖼️🖼️🖼️🖼️🖼️🖼️🖼️🖼️🖼️🖼️🖼️🖼️🖼️🖼️🖼️🖼️
   Future<RepositoryDatasource> openCamera() async {
     final PictureDatasource pictureDatasource = await pictureApi.openCamera();
-    return repositoryDatasource.copyWith(pictureDatasource: pictureDatasource);
+    repositoryDatasource = repositoryDatasource.copyWith(
+      pictureDatasource: pictureDatasource,
+    );
+    return repositoryDatasource;
   }
 
+  // changeCamera
+  Future<RepositoryDatasource> changeCamera() async {
+    final CameraLensDirection lensDirection = repositoryDatasource
+        .pictureDatasource!
+        .controller!
+        .value
+        .description
+        .lensDirection;
+    // print(lensDirection);
+    final newLense = lensDirection == CameraLensDirection.back
+        ? CameraLensDirection.front
+        : CameraLensDirection.back;
+    final PictureDatasource pictureDatasource = await pictureApi.openCamera(
+      lensDirection: newLense,
+    );
+    repositoryDatasource = repositoryDatasource.copyWith(
+      pictureDatasource: pictureDatasource,
+    );
+    return repositoryDatasource;
+  }
+
+  // FlashMode
+  Future<void> flashMode() async {
+    final CameraLensDirection lensDirection = repositoryDatasource
+        .pictureDatasource!
+        .controller!
+        .value
+        .description
+        .lensDirection;
+
+    final FlashMode flashMode =
+        repositoryDatasource.pictureDatasource!.controller!.value.flashMode;
+    print(flashMode);
+
+    if (lensDirection != CameraLensDirection.back) return;
+
+    final newMode =
+        repositoryDatasource.pictureDatasource!.controller!.value.flashMode ==
+            FlashMode.off
+        ? FlashMode.always
+        : FlashMode.off;
+
+    await repositoryDatasource.pictureDatasource!.controller!.setFlashMode(
+      newMode,
+    );
+    repositoryDatasource = repositoryDatasource.copyWith(
+      pictureDatasource: repositoryDatasource.pictureDatasource!,
+    );
+  }
+
+  // takePicture
   Future<RepositoryDatasource> takePicture() async {
     final PictureDatasource pictureDatasource = await pictureApi.takePicture();
     repositoryDatasource = repositoryDatasource.copyWith(
@@ -121,8 +175,13 @@ base class Repository {
 
   Future<RepositoryDatasource> openGallery() async {
     final pictureDatasource = await pictureApi.openGallery();
+    if (pictureDatasource.image != null) {
+      repositoryDatasource = repositoryDatasource.copyWith(
+        pictureDatasource: pictureDatasource,
+      );
+    }
     repositoryDatasource = repositoryDatasource.copyWith(
-      pictureDatasource: pictureDatasource,
+      pictureDatasource: null,
     );
 
     return repositoryDatasource;

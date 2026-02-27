@@ -1,4 +1,4 @@
-import 'package:camera/camera.dart';
+import 'package:picture/picture.dart';
 
 enum PictureStatus {
   empty,
@@ -14,15 +14,14 @@ enum PictureStatus {
 class PictureState {
   final PictureStatus status;
   final String? errorMessage;
-  final CameraController? controller;
-  final XFile? image;
+  final PictureDatasource? pictureDatasource;
+
   final dynamic response;
 
   PictureState({
     required this.status,
     this.errorMessage,
-    this.controller,
-    this.image,
+    this.pictureDatasource,
     this.response,
   });
 
@@ -31,15 +30,13 @@ class PictureState {
   PictureState copyWith({
     PictureStatus? status,
     String? errorMessage,
-    CameraController? controller,
-    XFile? image,
+    PictureDatasource? pictureDatasource,
     dynamic response,
   }) {
     return PictureState(
       status: status ?? this.status,
       errorMessage: errorMessage ?? this.errorMessage,
-      controller: controller ?? this.controller,
-      image: image ?? this.image,
+      pictureDatasource: pictureDatasource ?? this.pictureDatasource,
       response: response ?? this.response,
     );
   }

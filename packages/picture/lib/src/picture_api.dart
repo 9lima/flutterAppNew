@@ -7,26 +7,30 @@ class PictureApi {
     : pictureDatasource = pictureDatasource ?? PictureDatasource();
   PictureDatasource? pictureDatasource;
 
-  Future<PictureDatasource> openCamera() async {
+  Future<PictureDatasource> openCamera({
+    CameraLensDirection lensDirection = CameraLensDirection.back,
+  }) async {
     try {
       if (pictureDatasource?.controller != null &&
           pictureDatasource!.controller!.value.isInitialized) {
-        pictureDatasource!.controller == null;
+        await pictureDatasource!.controller!.dispose();
       }
-      final cameras = await availableCameras();
+      List<CameraDescription> cameras = await availableCameras();
+
       final CameraDescription backCamera = cameras.firstWhere(
-        (camera) => camera.lensDirection == CameraLensDirection.back,
+        (camera) => camera.lensDirection == lensDirection,
         orElse: () => cameras.first,
       );
-      final CameraController? controller = CameraController(
+
+      final CameraController controller = CameraController(
         backCamera,
         ResolutionPreset.ultraHigh,
         enableAudio: false,
         imageFormatGroup: ImageFormatGroup.jpeg,
       );
-      if (controller == null) {
-        return pictureDatasource!.copyWith(errorMessage: 'No camera available');
-      }
+      // if (controller == null) {
+      //   return pictureDatasource!.copyWith(errorMessage: 'No camera available');
+      // }
       await controller.initialize();
       pictureDatasource = pictureDatasource!.copyWith(
         controller: controller,

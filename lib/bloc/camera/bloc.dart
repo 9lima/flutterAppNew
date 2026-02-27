@@ -14,6 +14,8 @@ class PictureBloc extends Bloc<PictureEvent, PictureState> {
     on<PictureTaken>(_onTaken);
     on<PickPictureFromGallery>(_onPickFromGallery, transformer: droppable());
     on<PictureUpload>(_onPictureUpload, transformer: droppable());
+    on<PictureChangeLens>(_onChangeCamera);
+    on<PictureChangeFlash>(_toggleFlash);
   }
 
   Future<void> _loadKeys(LoadKeys event, Emitter emit) async {
@@ -32,8 +34,9 @@ class PictureBloc extends Bloc<PictureEvent, PictureState> {
   // ////////////// //
   Future<void> _onInit(PictureInit event, Emitter emit) async {
     try {
-      if (state.controller != null && !state.controller!.value.isInitialized) {
-        state.controller == null;
+      if (state.pictureDatasource?.controller != null &&
+          !state.pictureDatasource!.controller!.value.isInitialized) {
+        state.pictureDatasource?.controller == null;
       }
       final RepositoryDatasource controller = await repository.openCamera();
       if (controller.pictureDatasource!.controller == null) {
@@ -50,13 +53,55 @@ class PictureBloc extends Bloc<PictureEvent, PictureState> {
       emit(
         state.copyWith(
           status: PictureStatus.init,
-          controller: controller.pictureDatasource!.controller,
+          pictureDatasource: controller.pictureDatasource,
         ),
       );
     } catch (e) {
       emit(state.copyWith(status: PictureStatus.error, errorMessage: '$e'));
     }
   }
+
+  // Back camera
+  Future<void> _onChangeCamera(PictureChangeLens event, Emitter emit) async {
+    try {
+      // if (state.pictureDatasource?.controller != null &&
+      //     !state.pictureDatasource!.controller!.value.isInitialized) {
+      //   state.pictureDatasource?.controller == null;
+      // }
+      final RepositoryDatasource controller = await repository.changeCamera();
+      if (controller.pictureDatasource!.controller == null) {
+        emit(
+          state.copyWith(
+            status: PictureStatus.error,
+            errorMessage:
+                controller.pictureDatasource?.errorMessage ??
+                'Camera is not available',
+          ),
+        );
+      }
+
+      emit(
+        state.copyWith(
+          status: PictureStatus.init,
+          pictureDatasource: controller.pictureDatasource,
+        ),
+      );
+    } catch (e) {
+      emit(state.copyWith(status: PictureStatus.error, errorMessage: '$e'));
+    }
+  }
+
+  //FlashMode
+  Future<void> _toggleFlash(PictureChangeFlash event, Emitter emit) async {
+    if (!state.pictureDatasource!.controller!.value.isInitialized) return;
+
+    try {
+      await repository.flashMode();
+    } catch (e) {
+      emit(state.copyWith(status: PictureStatus.error, errorMessage: '$e'));
+    }
+  }
+  //
 
   Future<void> _onTaken(PictureTaken event, Emitter emit) async {
     try {
@@ -75,7 +120,7 @@ class PictureBloc extends Bloc<PictureEvent, PictureState> {
       emit(
         state.copyWith(
           status: PictureStatus.loading,
-          image: image.pictureDatasource!.image,
+          pictureDatasource: image.pictureDatasource,
         ),
       );
 
@@ -86,7 +131,7 @@ class PictureBloc extends Bloc<PictureEvent, PictureState> {
       emit(
         state.copyWith(
           status: PictureStatus.taken,
-          image: image.pictureDatasource!.image,
+          pictureDatasource: image.pictureDatasource,
         ),
       );
     } on CameraException catch (e) {
@@ -101,33 +146,41 @@ class PictureBloc extends Bloc<PictureEvent, PictureState> {
     Emitter emit,
   ) async {
     try {
-      final RepositoryDatasource image = await repository.openGallery();
-      if (image.pictureDatasource!.errorMessage != null) {
+      final RepositoryDatasource repoData = await repository.openGallery();
+
+      if (repoData.pictureDatasource?.errorMessage != null) {
         emit(
           state.copyWith(
             status: PictureStatus.error,
-            errorMessage: image.pictureDatasource!.errorMessage,
+            errorMessage: repoData.pictureDatasource!.errorMessage,
           ),
         );
+        return;
       }
-      if (image.pictureDatasource!.image == null) return;
-      emit(
-        state.copyWith(
-          status: PictureStatus.loading,
-          image: image.pictureDatasource!.image,
-        ),
-      );
 
-      final String? enc = await repository.encrypt();
-      if (enc != null) {
-        emit(state.copyWith(status: PictureStatus.error, errorMessage: enc));
+      if (repoData.pictureDatasource?.image == null) {
+        return; // Don't run encryption
       }
+
       emit(
         state.copyWith(
           status: PictureStatus.galleryPicked,
-          image: image.pictureDatasource!.image,
+          pictureDatasource: repoData.pictureDatasource,
         ),
       );
+
+      // final String? enc = await repository.encrypt();
+      // if (enc != null) {
+      //   emit(state.copyWith(status: PictureStatus.error, errorMessage: enc));
+      //   return;
+      // }
+
+      // emit(
+      //   state.copyWith(
+      //     status: PictureStatus.galleryPicked,
+      //     pictureDatasource: picture,
+      //   ),
+      // );
     } catch (e) {
       emit(state.copyWith(status: PictureStatus.error, errorMessage: '$e'));
     }
@@ -139,7 +192,7 @@ class PictureBloc extends Bloc<PictureEvent, PictureState> {
       emit(state.copyWith(status: PictureStatus.uploading));
       final RepositoryDatasource res = await repository.sendRequest(
         '/dataa',
-        state.image!,
+        state.pictureDatasource!.image!,
       );
 
       emit(
